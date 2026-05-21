@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>CTR 전결검색</title>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}body{font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;background:#0B2C5C;min-height:100vh;display:flex;align-items:center;justify-content:center}.card{background:#fff;border-radius:20px;padding:48px 40px;width:380px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.3)}.logo{font-size:32px;font-weight:800;color:#0B2C5C;letter-spacing:-1px;margin-bottom:4px}.mobi{font-size:13px;color:#6B7480;margin-bottom:4px}.ptitle{font-size:15px;font-weight:600;color:#1A1F26;margin-bottom:28px}.pww{position:relative;margin-bottom:10px}.pww input{width:100%;padding:13px 46px 13px 16px;border:1.5px solid #DCE1E8;border-radius:10px;font-size:15px;font-family:inherit;outline:none;transition:border-color .15s}.pww input:focus{border-color:#13427F;box-shadow:0 0 0 3px rgba(19,66,127,.1)}.pww input.erri{border-color:#EA580C}.eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;line-height:1;color:#6B7480}.etxt{color:#EA580C;font-size:13px;margin-bottom:12px;min-height:18px}.btn{width:100%;padding:14px;background:#0B2C5C;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px}.btn:hover{background:#13427F}.btn:disabled{background:#B8C0CB;cursor:not-allowed}.sp{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}.note{font-size:11px;color:#B8C0CB;margin-top:20px}</style>
+</head>
+<body>
+<div class="card">
+<div class="logo">CTR</div>
+<div class="mobi">Mobility</div>
+<div class="ptitle">CTR 전결검색</div>
+<div class="pww">
+<input type="password" id="pw" placeholder="비밀번호를 입력하세요" autofocus>
+<button class="eye" id="eye" type="button">👁</button>
+</div>
+<div class="etxt" id="etxt"></div>
+<button class="btn" id="btn" onclick="go()">
+<span id="lbl">입장</span>
+</button>
+<div class="note">CTR 내부 전용 · 허가된 사용자만 접근 가능합니다</div>
+</div>
+<script>var D=__D_PLACEHOLDER__;function fB(b64){var s=atob(b64);var u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}var busy=false;document.getElementById("eye").onclick=function(){var i=document.getElementById("pw");i.type=i.type==="password"?"text":"password";this.textContent=i.type==="password"?"👁":"🙈";};document.getElementById("pw").onkeydown=function(e){if(e.key==="Enter")go();};async function go(){if(busy)return;var pw=document.getElementById("pw").value;if(!pw)return;busy=true;var btn=document.getElementById("btn");var lbl=document.getElementById("lbl");btn.disabled=true;lbl.innerHTML='<div class="sp"></div>';document.getElementById("etxt").textContent="";document.getElementById("pw").classList.remove("erri");try{var enc=new TextEncoder();var km=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveKey"]);var key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:fB(D.salt),iterations:D.iterations,hash:"SHA-256"},km,{name:"AES-CBC",length:256},false,["decrypt"]);var dec=await crypto.subtle.decrypt({name:"AES-CBC",iv:fB(D.iv)},key,fB(D.ciphertext));var html=new TextDecoder().decode(dec);document.open();document.write(html);document.close();}catch(e){document.getElementById("etxt").textContent="비밀번호가 올바르지 않습니다.";document.getElementById("pw").classList.add("erri");document.getElementById("pw").value="";document.getElementById("pw").focus();lbl.textContent="입장";btn.disabled=false;busy=false;}}</script>
+</body>
+</html>
