@@ -1,0 +1,59 @@
+name: Build CTR 전결검색 HTML
+
+on:
+  push:
+    paths:
+      - "data/**.xlsx"
+      - "build.py"
+      - "template/wrapper.html"
+      - ".github/workflows/build.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-html
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install cryptography openpyxl
+
+      - name: Verify password secret is set
+        env:
+          PASSWORD: ${{ secrets.PAGE_PASSWORD }}
+        run: |
+          if [ -z "$PASSWORD" ]; then
+            echo "::error::Repository secret PAGE_PASSWORD 가 설정되어 있지 않습니다."
+            exit 1
+          fi
+
+      - name: Build HTML
+        env:
+          PASSWORD: ${{ secrets.PAGE_PASSWORD }}
+        run: python build.py
+
+      - name: Commit updated HTML
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "CTR_전결검색.html"
+          if git diff --cached --quiet; then
+            echo "변경 없음 — 커밋 생략"
+          else
+            git commit -m "build: 엑셀 갱신에 따른 HTML 자동 빌드"
+            git push
+          fi
